@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\BlogPost;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,11 +35,13 @@ class BlogController extends AbstractController
     //define a default value for parameters, use php bin\console debug:router to see routes
     //handle parameters from url by Request
     //symfony must return a Response like Object
+    //Do not forger to add a requirement to distinct the route from the add route which received a parameters too
     /**
-     * @Route("/{page}", name="blog_list", defaults={"page":5})
+     * @Route("/{page}", name="blog_list", defaults={"page":5}, requirements={"page"="\d+"})
      */
     public function list($page = 1, Request $request)
     {
+
         $limit = $request->get('limit', 10);
         return $this->json(
             [
@@ -56,7 +59,7 @@ class BlogController extends AbstractController
 
     //make different route by requirements
     /**
-     * @Route("/{id}",name="blog_by_id", requirements={"id"="\d+"})
+     * @Route("/post/{id}",name="blog_by_id", requirements={"id"="\d+"})
      */
     public function post($id)
     {
@@ -65,7 +68,7 @@ class BlogController extends AbstractController
         );
     }
     /**
-     * @Route("/{slug}",name="blog_by_slug")
+     * @Route("/post/{slug}",name="blog_by_slug")
      */
     public function postBySlug($slug)
     {
@@ -75,12 +78,18 @@ class BlogController extends AbstractController
     }
 
     /**
-     * @Route('/add', name="blog_add", methods={"POST"})
+     * @Route("/add", name="blog_add", methods={"POST"})
      */
     public function add(Request $request)
     {
-        /** @Var Serializer $serializer */
+        /**
+         * @var Serializer $serializer
+         */
         $serializer = $this->get('serializer');
         $blogPost = $serializer->deserialize($request->getContent(), BlogPost::class, 'json');
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($blogPost);
+        $em->flush();
+        return $this->json($blogPost);
     }
 }
