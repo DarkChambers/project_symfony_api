@@ -29,20 +29,35 @@ class BlogController extends AbstractController
             'title' => "this is the last exemple",
         ],
     ];
+    //define a default value for parameters, use php bin\console debug:router to see routes
+
     /**
-     * @Route("/", name="blog_list")
+     * @Route("/{page}", name="blog_list", defaults={"page":5})
      */
-    public function list()
+    public function list($page = 1)
     {
-        return new JsonResponse(self::POSTS);
+        return new JsonResponse(
+            [
+                'page' => $page,
+                'data' => array_map(
+                    function ($item) {
+                        return $this->generateUrl('blog_by_slug', ['slug' => $item['slug']]);
+                    },
+                    self::POSTS
+                )
+            ]
+        );
     }
+
+    //make different route by requirements
     /**
-     * @Route("/{id}",name="blog_by_id")
+     * @Route("/{id}",name="blog_by_id", requirements={"id"="\d+"})
      */
     public function post($id)
     {
         return new JsonResponse(
-            self::POSTS[array_search($id, array_column(self::POSTS, 'id'))]);
+            self::POSTS[array_search($id, array_column(self::POSTS, 'id'))]
+        );
     }
     /**
      * @Route("/{slug}",name="blog_by_slug")
@@ -50,6 +65,7 @@ class BlogController extends AbstractController
     public function postBySlug($slug)
     {
         return new JsonResponse(
-            self::POSTS[array_search($slug, array_column(self::POSTS, 'slug'))]);
+            self::POSTS[array_search($slug, array_column(self::POSTS, 'slug'))]
+        );
     }
 }
