@@ -5,9 +5,9 @@ namespace App\Controller;
 use App\Entity\BlogPost;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 //use annotations to define route and parameters
 /**
@@ -16,26 +16,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class BlogController extends AbstractController
 {
 
-    private const POSTS = [
-        [
-            'id' => 1,
-            'slug' => "hello-world",
-            'title' => "hello world",
-        ],
-        [
-            'id' => 2,
-            'slug' => "another-post",
-            'title' => "another post",
-        ],      [
-            'id' => 3,
-            'slug' => "last_example",
-            'title' => "this is the last exemple",
-        ],
-    ];
+
     //define a default value for parameters, use php bin\console debug:router to see routes
     //handle parameters from url by Request
     //symfony must return a Response like Object
     //Do not forger to add a requirement to distinct the route from the add route which received a parameters too
+    //add property_info : true to config
     /**
      * @Route("/{page}", name="blog_list", defaults={"page":5}, requirements={"page"="\d+"})
      */
@@ -43,16 +29,17 @@ class BlogController extends AbstractController
     {
 
         $limit = $request->get('limit', 10);
+        $repository=$this->getDoctrine()->getRepository(BlogPost::class);
+        $items = $repository->findAll();
         return $this->json(
             [
                 'page' => $page,
                 'limit' => $limit,
                 'data' => array_map(
-                    function ($item) {
-                        return $this->generateUrl('blog_by_slug', ['slug' => $item['slug']]);
+                    function (BlogPost $item) {
+                        return $this->generateUrl('blog_by_slug', ['slug' => $item->getSlug()]);
                     },
-                    self::POSTS
-                )
+                    $items)
             ]
         );
     }
@@ -64,7 +51,7 @@ class BlogController extends AbstractController
     public function post($id)
     {
         return $this->json(
-            self::POSTS[array_search($id, array_column(self::POSTS, 'id'))]
+            $this->getDoctrine()->getRepository(BlogPost::class)->find($id)
         );
     }
     /**
@@ -73,7 +60,7 @@ class BlogController extends AbstractController
     public function postBySlug($slug)
     {
         return $this->json(
-            self::POSTS[array_search($slug, array_column(self::POSTS, 'slug'))]
+            $this->getDoctrine()->getRepository(BlogPost::class)->findBy(['slug'=>$slug])
         );
     }
 
