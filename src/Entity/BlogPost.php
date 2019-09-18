@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BlogPostRepository")
+ * @ApiResource()
  */
 class BlogPost
 {
@@ -32,7 +34,8 @@ class BlogPost
     private $content;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="App\Entity\User",inversedBy="posts")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $author;
 
@@ -41,6 +44,7 @@ class BlogPost
      */
     private $slug;
 
+  
     public function getId(): ?int
     {
         return $this->id;
@@ -82,16 +86,21 @@ class BlogPost
         return $this;
     }
 
-    public function getAuthor(): ?string
+    /**
+     * @return User
+     */
+    public function getAuthor(): User
     {
         return $this->author;
     }
 
-    public function setAuthor(string $author): self
+     /**
+     * @param User $author
+     */
+    public function setAuthor(User $author): void
     {
         $this->author = $author;
-
-        return $this;
+       
     }
 
 
