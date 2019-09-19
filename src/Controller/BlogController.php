@@ -63,7 +63,7 @@ class BlogController extends AbstractController
 
     /**
      * @Route("/post/{slug}",name="blog_by_slug",methods={"GET"})
-     * The beow annotation is not required when $post is typehinted with BlogSpot 
+     * The below annotation is not required when $post is typehinted with BlogSpot 
      * and route parameter name matches any field on the BlogSpost entity
      * @ParamConverter("post",class="App:BlogPost", options={"mapping":{"slug":"slug"}})
      */
@@ -83,6 +83,7 @@ class BlogController extends AbstractController
     {
         /**
          * @var Serializer $serializer
+         * using serializer to 
          */
         $serializer = $this->get('serializer');
         $blogPost = $serializer->deserialize($request->getContent(), BlogPost::class, 'json');

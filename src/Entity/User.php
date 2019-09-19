@@ -87,12 +87,12 @@ class User
 
     public function getName(): ?string
     {
-        return $this->string;
+        return $this->name;
     }
 
-    public function setName(string $string): self
+    public function setName(string $name): self
     {
-        $this->string = $string;
+        $this->name = $name;
 
         return $this;
     }
@@ -113,5 +113,25 @@ class User
     public function getComments()
     {
         return $this->comments;
+    }
+
+    /**
+     * Get the value of email
+     */ 
+    public function getEmail() : string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Set the value of email
+     *
+     * @return  self
+     */ 
+    public function setEmail(string $email) : self
+    {
+        $this->email = $email;
+
+        return $this;
     }
 }
